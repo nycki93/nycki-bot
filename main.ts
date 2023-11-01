@@ -2,68 +2,60 @@
 
 type ActionExit = { type: 'exit' };
 type ActionMessage = { type: 'message', message: string };
-
 type Action = ActionExit | ActionMessage;
 
+type Command = (args: string[]) => Action[];
+type CommandContext = Record<string, Command>;
+
 class Bot {
-  state = 'idle';
-  name: string | null = null;
+  mode = 'idle';
+  name = 'user';
+  commands: CommandContext = {
+    ping: this.ping,
+    hello: this.hello,
+    hi: this.hello,
+    exit: this.exit,
+    quit: this.exit,
+    goodbye: this.exit,
+  };
 
   init(): Action[] {
     return [];
   }
 
   send(message: string): Action[] {
-    if (this.state === 'idle') {
-      return this.idle(message);
-    } else if (this.state === 'hi') {
-      return this.hi(message);
-    }
-    return [];
-  }
-
-  idle(message: string): Action[] {
-    const args = message.trim().split(/\s+/);
-    const argc = args.length;
-    if (argc === 0) {
-      return [];
-    } else if (argc === 1 && args[0] === 'ping') {
+    if (this.mode === 'idle') {
+      const args = message.trim().split(/\s+/);
+      if (args.length === 0) {
+        return [];
+      }
+      if (args[0] in this.commands) {
+        return this.commands[args[0]](args);
+      }
       return [{
         type: 'message',
-        message: 'pong',
-      }]
-    } else if (argc === 1 && args[0] === 'hi' && this.name === null) {
-      this.state = 'hi';
-      return [{
-        type: 'message',
-        message: 'hi! what is your name?'
-      }]
-    } else if (argc === 1 && args[0] === 'hi') {
-      return [{
-        type: 'message',
-        message: `hi, ${this.name}!`,
-      }]
-    } else if (argc === 1 && args[0] === 'exit') {
-      return [{ type: 'exit' }];
-    } else {
-      return [];
-    }
-  }
-
-  hi(message: string): Action[] {
-    name = message.trim();
-    if (name.length === 0) {
-      return [{
-        type: 'message',
-        message: 'what is your name?'
+        message: `[error] unknown command ${args[0]}.`,
       }];
     }
-    this.name = name;
-    this.state = 'idle';
     return [{
       type: 'message',
-      message: `hi, ${name}!`,
+      message: `[error] unknown mode ${this.mode}.`,
     }];
+  }
+
+  exit(): Action[] {
+    return [
+      { type: 'message', message: 'goodbye!' },
+      { type:'exit' },
+    ];
+  } 
+
+  ping(): Action[] {
+    return [{ type: 'message', message: 'pong!' }];
+  }
+
+  hello(): Action[] {
+    return [{ type: 'message', message: `hello, ${this.name}!` }];
   }
 }
 
