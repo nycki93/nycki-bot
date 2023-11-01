@@ -1,82 +1,88 @@
-type EventNone = { type: 'none' };
-type EventExit = { type: 'exit' };
-type EventMessage = { type: 'message', message: string };
+#!/usr/bin/env deno
 
-type Event = EventNone | EventExit | EventMessage;
+type ActionExit = { type: 'exit' };
+type ActionMessage = { type: 'message', message: string };
+
+type Action = ActionExit | ActionMessage;
 
 class Bot {
   state = 'idle';
   name: string | null = null;
-  send(message: string): Event {
+
+  init(): Action[] {
+    return [];
+  }
+
+  send(message: string): Action[] {
     if (this.state === 'idle') {
       return this.idle(message);
     } else if (this.state === 'hi') {
       return this.hi(message);
     }
-    return { type: 'none' };
+    return [];
   }
 
-  idle(message: string): Event {
-    const tokens = message.trim().split(/\s+/);
-    if (tokens.length === 0) {
-      return { type: 'none' };
-    } else if (tokens.length === 1 && tokens[0] === 'ping') {
-      return {
+  idle(message: string): Action[] {
+    const args = message.trim().split(/\s+/);
+    const argc = args.length;
+    if (argc === 0) {
+      return [];
+    } else if (argc === 1 && args[0] === 'ping') {
+      return [{
         type: 'message',
         message: 'pong',
-      }
-    } else if (
-      tokens.length === 1 
-      && tokens[0] === 'hi' 
-      && this.name === null
-    ) {
+      }]
+    } else if (argc === 1 && args[0] === 'hi' && this.name === null) {
       this.state = 'hi';
-      return {
+      return [{
         type: 'message',
         message: 'hi! what is your name?'
-      }
-    } else if (tokens.length === 1 && tokens[0] === 'hi') {
-      return {
+      }]
+    } else if (argc === 1 && args[0] === 'hi') {
+      return [{
         type: 'message',
         message: `hi, ${this.name}!`,
-      }
-    } else if (tokens.length === 1 && tokens[0] === 'exit') {
-      return { type: 'exit' }
+      }]
+    } else if (argc === 1 && args[0] === 'exit') {
+      return [{ type: 'exit' }];
     } else {
-      return { type: 'none' };
+      return [];
     }
   }
 
-  hi(message: string): Event {
+  hi(message: string): Action[] {
     name = message.trim();
     if (name.length === 0) {
-      return {
+      return [{
         type: 'message',
         message: 'what is your name?'
-      }
+      }];
     }
     this.name = name;
     this.state = 'idle';
-    return {
+    return [{
       type: 'message',
       message: `hi, ${name}!`,
-    }
+    }];
   }
 }
 
 if (import.meta.main) {
   const bot = new Bot();
+  const actions = bot.init();
   while (true) {
-    const message = prompt('bot>') || '';
-    const event = bot.send(message);
-    if (event.type === 'message') {
-      console.log(event.message);
-    } else if (event.type === 'none') {
+    const a = actions.shift();
+    if (!a) {
+      // no pending actions; get user input
+      const message = prompt('bot>') || '';
+      actions.push(...bot.send(message));
       continue;
-    } else if (event.type === 'exit') {
+    } else if (a.type === 'message') {
+      console.log(a.message);
+    } else if (a.type === 'exit') {
       break;
     } else {
-      console.log('[error] unknown event type', event);
+      console.log('[error] unknown action', a);
     }
   }
 }
