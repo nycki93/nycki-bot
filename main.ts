@@ -1,41 +1,47 @@
 #!/usr/bin/env deno
 
 type ActionExit = { type: 'exit' };
+type ActionListen = { type: 'listen' };
 type ActionMessage = { type: 'message', message: string };
-type Action = ActionExit | ActionMessage;
+type Action = ActionExit | ActionListen | ActionMessage;
 
 type Command = (args: string[]) => Action[];
-type CommandContext = Record<string, Command>;
+
+enum BOT_MODE { idle, getName };
 
 class Bot {
-  mode = 'idle';
-  name = 'user';
-  commands: CommandContext = {
-    ping: this.ping,
-    hello: this.hello,
-    hi: this.hello,
-    exit: this.exit,
-    quit: this.exit,
-    goodbye: this.exit,
-  };
+  mode = BOT_MODE.idle;
+  name: string | null = null;
+  commands: Record<string, Record<string, Command>> = {
+    idle: {
+      ping: this.ping,
+      hello: this.hello,
+      hi: this.hello,
+      exit: this.exit,
+      quit: this.exit,
+      goodbye: this.exit,
+    }
+  }
 
   init(): Action[] {
     return [];
   }
 
   send(message: string): Action[] {
-    if (this.mode === 'idle') {
+    if (this.mode === BOT_MODE.idle) {
       const args = message.trim().split(/\s+/);
       if (args.length === 0) {
         return [];
       }
-      if (args[0] in this.commands) {
-        return this.commands[args[0]](args);
+      if (args[0] in this.commands.idle) {
+        return this.commands.idle[args[0]].call(this, args);
       }
       return [{
         type: 'message',
         message: `[error] unknown command ${args[0]}.`,
       }];
+    } else if (this.mode === BOT_MODE.getName) {
+      return this.getName(message);
     }
     return [{
       type: 'message',
@@ -55,7 +61,26 @@ class Bot {
   }
 
   hello(): Action[] {
-    return [{ type: 'message', message: `hello, ${this.name}!` }];
+    if (this.name !== null) {
+      return [{ type: 'message', message: `hello, ${this.name}!` }];
+    } else {
+      this.mode = BOT_MODE.getName;
+      return this.getName('');
+    }
+  }
+
+  getName(message: string): Action[] {
+    name = message.trim();
+    if (name.length === 0) {
+      return [{
+        type: 'message',
+        message: 'what is your name?'
+      }];
+    } else {
+      this.name = message;
+      this.mode = BOT_MODE.idle;
+      return this.hello();
+    }
   }
 }
 
