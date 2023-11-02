@@ -7,7 +7,7 @@ type Action = ActionExit | ActionListen | ActionMessage;
 
 type Command = (args: string[]) => Action[];
 
-enum BOT_MODE { idle, getName };
+enum BOT_MODE { idle, getName }
 
 class Bot {
   mode = BOT_MODE.idle;
@@ -70,14 +70,14 @@ class Bot {
   }
 
   getName(message: string): Action[] {
-    name = message.trim();
+    const name = message.trim();
     if (name.length === 0) {
       return [{
         type: 'message',
         message: 'what is your name?'
       }];
     } else {
-      this.name = message;
+      this.name = name;
       this.mode = BOT_MODE.idle;
       return this.hello();
     }
