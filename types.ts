@@ -6,4 +6,4 @@ export type ActionMessage = { type: 'message', text: string };
 export type ActionQuit = { type: 'quit' };
 export type Action = ActionListen | ActionMessage | ActionQuit;
 
-export type Bot<T> = Generator<Action, T, Event>;
+export type Actor<T> = Generator<Action, T, Event>;

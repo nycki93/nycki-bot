@@ -1,10 +1,10 @@
 #!/usr/bin/env deno
-import { Event, EventMessage, Bot } from './types.ts';
+import { Event, EventMessage, Actor } from './types.ts';
 import { playTicTacToe } from "./tictactoe.ts";
 
 type State = { name: string | null }
 
-function* botMain(): Bot<void> {
+function* botMain(): Actor<void> {
     let state: State = { name: null };
     while (true) {
         const event: Event = yield { type: 'listen' };
@@ -23,7 +23,7 @@ function* botMain(): Bot<void> {
     }
 }
 
-function* handleMessage(state: State, event: EventMessage): Bot<State> {
+function* handleMessage(state: State, event: EventMessage): Actor<State> {
     const args = event.text.trim().split(/\s+/);
     switch (args[0]) {
         case 'quit':
@@ -52,6 +52,15 @@ function* handleMessage(state: State, event: EventMessage): Bot<State> {
             yield* playTicTacToe();
             return state;
         }
+        case 'save': {
+            yield { type: 'message', text: JSON.stringify(state) };
+            return state;
+        }
+        case 'load': {
+            state = JSON.parse(event.text.slice(args[0].length + 1));
+            yield { type: 'message', text: JSON.stringify(state) };
+            return state;
+        }
         default: {
             // do nothing for unrecognized messages
             return state;
@@ -59,7 +68,7 @@ function* handleMessage(state: State, event: EventMessage): Bot<State> {
     }
 }
 
-function* getName(state: State): Bot<State> {
+function* getName(state: State): Actor<State> {
     while (true) {
         yield { type: 'message', text: 'what is your name?' };
         const e = yield { type: 'listen' };
