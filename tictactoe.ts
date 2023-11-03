@@ -5,6 +5,8 @@ export class TictactoeGame implements Plugin {
     player_x?: string;
     player_o?: string;
     board = Array(9).fill(null).map((_v, i) => (i+1).toString());
+    turn?: string;
+    done = false;
     constructor(bot: Bot) {
         this.bot = bot;
     }
@@ -44,6 +46,7 @@ export class TictactoeGame implements Plugin {
         }
 
         if (this.player_x && this.player_o) {
+            this.turn = 'x';
             this.bot.write('game started!');
             this.bot.write(this.draw());
         }
@@ -52,18 +55,28 @@ export class TictactoeGame implements Plugin {
     }
 
     play(e: Event, args: string[]) {
+        if (this.done) {
+            this.bot.write('the game has ended.');
+            return true;
+        }
+        
         if (!this.player_x || !this.player_o) {
             this.bot.write('not enough players to begin.');
             return true;
         }
 
+        if (e.user !== this.player_x && e.user !== this.player_o) {
+            this.bot.write('you are not in this game!');
+            return true;
+        }
+
         let team;
-        if (e.user === this.player_x) {
+        if(this.turn === 'x' && e.user === this.player_x) {
             team = 'x';
-        } else if (e.user === this.player_o) {
+        } else if (this.turn === 'o' && e.user === this.player_o) {
             team = 'o';
         } else {
-            this.bot.write('you are not in this game!');
+            this.bot.write('it is not your turn!');
             return true;
         }
 
@@ -73,8 +86,28 @@ export class TictactoeGame implements Plugin {
             return true;
         }
 
+        if (['x', 'o'].includes(this.board[target])) {
+            this.bot.write('that spot is already claimed!');
+            return true;
+        }
         this.board[target] = team;
+        this.turn = team === 'x' ? 'o' : 'x';
         this.bot.write(this.draw());
+
+        const winner = this.getWinner();
+        if (winner) {
+            this.done = true;
+            this.bot.write(`${winner} is the winner!`);
+            return true;
+        }
+
+        if (this.isFull()) {
+            this.done = true;
+            this.bot.write('the game is a draw.');
+            return true;
+        }
+
+        // otherwise, continue the game as normal
         return true;
     }
 
@@ -91,5 +124,27 @@ export class TictactoeGame implements Plugin {
             r = r.replace((i+1).toString(), v);
         });
         return r;
+    }
+
+    lines = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6],
+    ];
+    getWinner() {
+        const line = this.lines.find(([a, b, c]) => (
+            this.board[a]
+            && this.board[a] === this.board[b] 
+            && this.board[a] === this.board[c]
+        ));
+        if (line) {
+            return this.board[line[0]];
+        } else {
+            return null;
+        }
+    }
+
+    isFull() {
+        return this.board.filter(a => ['x', 'o'].includes(a)).length === 9;
     }
 }
