@@ -78,12 +78,12 @@ export class TictactoeGame implements Plugin {
         return true;
     }
 
-    template = ('\n' +
+    template = ('```\n' +
         ' 1 | 2 | 3 \n' +
         '---|---|---\n' +
         ' 4 | 5 | 6 \n' +
         '---|---|---\n' +
-        ' 7 | 8 | 9 '
+        ' 7 | 8 | 9 \n```'
     );
     draw() {
         let r = this.template;

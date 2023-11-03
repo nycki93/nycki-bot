@@ -11,7 +11,7 @@ export class Commands implements Plugin {
         if (e.type !== 'message') return false;
         const text = e.text.trim();
         if (text === 'ping') {
-            this.bot.write('pong');
+            this.bot.write(`${e.user} pong`);
             return true;
         }
         if (['hello', 'hi'].includes(text)) {
