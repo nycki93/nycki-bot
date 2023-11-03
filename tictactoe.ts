@@ -4,7 +4,7 @@ export class TictactoeGame implements Plugin {
     bot: Bot;
     player_x?: string;
     player_o?: string;
-    board = Array(9).fill(' ');
+    board = Array(9).fill(null).map((_v, i) => (i+1).toString());
     constructor(bot: Bot) {
         this.bot = bot;
     }
@@ -45,7 +45,7 @@ export class TictactoeGame implements Plugin {
 
         if (this.player_x && this.player_o) {
             this.bot.write('game started!');
-            this.bot.write(this.board.toString());
+            this.bot.write(this.draw());
         }
 
         return true;
@@ -74,7 +74,22 @@ export class TictactoeGame implements Plugin {
         }
 
         this.board[target] = team;
-        this.bot.write(this.board.toString());
+        this.bot.write(this.draw());
         return true;
+    }
+
+    template = ('\n' +
+        ' 1 | 2 | 3 \n' +
+        '---|---|---\n' +
+        ' 4 | 5 | 6 \n' +
+        '---|---|---\n' +
+        ' 7 | 8 | 9 '
+    );
+    draw() {
+        let r = this.template;
+        this.board.forEach((v, i) => {
+            r = r.replace((i+1).toString(), v);
+        });
+        return r;
     }
 }
