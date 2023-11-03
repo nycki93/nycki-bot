@@ -1,7 +1,7 @@
 import { Bot, Event, Plugin } from './types.ts';
 import { TictactoeGame } from "./tictactoe.ts";
 
-class Commands implements Plugin {
+export class Commands implements Plugin {
     bot: Bot;
     constructor(bot: Bot) {
         this.bot = bot;
