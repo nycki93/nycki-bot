@@ -1,105 +1,104 @@
-#!/usr/bin/env deno
+type Event = {
+    type: 'message',
+    user: string,
+    text: string
+}
 
-type ActionExit = { type: 'exit' };
-type ActionListen = { type: 'listen' };
-type ActionMessage = { type: 'message', message: string };
-type Action = ActionExit | ActionListen | ActionMessage;
+interface Bot {
+    write: (text: string) => void,
+    quit: () => void,
+}
 
-type Command = (args: string[]) => Action[];
+interface Plugin {
+    send: (event: Event) => boolean,
+}
 
-enum BOT_MODE { idle, getName }
-
-class Bot {
-  mode = BOT_MODE.idle;
-  name: string | null = null;
-  commands: Record<string, Record<string, Command>> = {
-    idle: {
-      ping: this.ping,
-      hello: this.hello,
-      hi: this.hello,
-      exit: this.exit,
-      quit: this.exit,
-      goodbye: this.exit,
+class Commands implements Plugin {
+    bot: Bot;
+    constructor(bot: Bot) {
+        this.bot = bot;
     }
-  }
 
-  init(): Action[] {
-    return [];
-  }
-
-  send(message: string): Action[] {
-    if (this.mode === BOT_MODE.idle) {
-      const args = message.trim().split(/\s+/);
-      if (args.length === 0) {
-        return [];
-      }
-      if (args[0] in this.commands.idle) {
-        return this.commands.idle[args[0]].call(this, args);
-      }
-      return [{
-        type: 'message',
-        message: `[error] unknown command ${args[0]}.`,
-      }];
-    } else if (this.mode === BOT_MODE.getName) {
-      return this.getName(message);
+    send(e: Event) {
+        if (e.type !== 'message') return false;
+        const text = e.text.trim();
+        if (text === 'ping') {
+            this.bot.write('pong');
+            return true;
+        }
+        if (['hello', 'hi'].includes(text)) {
+            this.bot.write(`hello, ${e.user}!`);
+            return true;
+        }
+        if (['quit', 'exit', 'goodbye'].includes(text)) {
+            this.bot.quit();
+            return true;
+        }
+        return false;
     }
-    return [{
-      type: 'message',
-      message: `[error] unknown mode ${this.mode}.`,
-    }];
-  }
+}
 
-  exit(): Action[] {
-    return [
-      { type: 'message', message: 'goodbye!' },
-      { type:'exit' },
-    ];
-  } 
-
-  ping(): Action[] {
-    return [{ type: 'message', message: 'pong!' }];
-  }
-
-  hello(): Action[] {
-    if (this.name !== null) {
-      return [{ type: 'message', message: `hello, ${this.name}!` }];
-    } else {
-      this.mode = BOT_MODE.getName;
-      return this.getName('');
+class TictactoeGame implements Plugin {
+    bot: Bot;
+    constructor(bot: Bot) {
+        this.bot = bot;
     }
-  }
 
-  getName(message: string): Action[] {
-    const name = message.trim();
-    if (name.length === 0) {
-      return [{
-        type: 'message',
-        message: 'what is your name?'
-      }];
-    } else {
-      this.name = name;
-      this.mode = BOT_MODE.idle;
-      return this.hello();
+    send(e: Event) {
+        if (e.type !== 'message') return false;
+        const args = e.text.trim().split(/\s+/);
+        if (args[0] === 'play') {
+            this.bot.write('game not implemented');
+            return true;
+        }
+        return false;
     }
-  }
+}
+
+class TestBot implements Bot {
+    plugins: Plugin[];
+    done = false;
+    user = 'user';
+    constructor() {
+        this.plugins = [];
+        this.plugins.push(new Commands(this));
+        this.plugins.push(new TictactoeGame(this));
+    }
+
+    write(text: string) {
+        console.log(`<bot> ${text}`);
+    }
+
+    quit() {
+        this.done = true;
+    }
+
+    run() {
+        while (!this.done) {
+            const text = prompt(`<${this.user}>`) || '';
+
+            // simulate switching users
+            const tokens = text.trim().split(/\s+/);
+            if (tokens[0] === 'be' && tokens.length === 2) {
+                this.user = tokens[1];
+                continue;
+            }
+            
+            // otherwise, pass input to plugins
+            const e: Event = {
+                type: 'message',
+                user: this.user,
+                text: text,
+            }
+            for (const p of this.plugins) {
+                const t = p.send(e);
+                if (t) break;
+            }
+        }
+    }
 }
 
 if (import.meta.main) {
-  const bot = new Bot();
-  const actions = bot.init();
-  while (true) {
-    const a = actions.shift();
-    if (!a) {
-      // no pending actions; get user input
-      const message = prompt('bot>') || '';
-      actions.push(...bot.send(message));
-      continue;
-    } else if (a.type === 'message') {
-      console.log(a.message);
-    } else if (a.type === 'exit') {
-      break;
-    } else {
-      console.log('[error] unknown action', a);
-    }
-  }
+    const bot = new TestBot();
+    bot.run();
 }
