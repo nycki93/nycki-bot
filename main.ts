@@ -1,17 +1,5 @@
-type Event = {
-    type: 'message',
-    user: string,
-    text: string
-}
-
-interface Bot {
-    write: (text: string) => void,
-    quit: () => void,
-}
-
-interface Plugin {
-    send: (event: Event) => boolean,
-}
+import { Bot, Event, Plugin } from './types.ts';
+import { TictactoeGame } from "./tictactoe.ts";
 
 class Commands implements Plugin {
     bot: Bot;
@@ -32,23 +20,6 @@ class Commands implements Plugin {
         }
         if (['quit', 'exit', 'goodbye'].includes(text)) {
             this.bot.quit();
-            return true;
-        }
-        return false;
-    }
-}
-
-class TictactoeGame implements Plugin {
-    bot: Bot;
-    constructor(bot: Bot) {
-        this.bot = bot;
-    }
-
-    send(e: Event) {
-        if (e.type !== 'message') return false;
-        const args = e.text.trim().split(/\s+/);
-        if (args[0] === 'play') {
-            this.bot.write('game not implemented');
             return true;
         }
         return false;
