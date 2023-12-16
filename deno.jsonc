@@ -1,4 +1,7 @@
 {
+  "imports": {
+    "irc": "https://deno.land/x/irc@v0.12.5/mod.ts"
+  },
   "tasks": {
     "dev": "deno run --watch main.ts"
   }
