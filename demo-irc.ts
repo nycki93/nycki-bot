@@ -26,7 +26,7 @@ class IrcBot implements Bot {
     write(text: string) {
         console.log(text);
         for (const line of text.split('\n')) {
-            console.log(`<bot> ${line}`);
+            console.log(`<${NICK}> ${line}`);
             this.client.privmsg(CHANNEL, line);
         }
     }
