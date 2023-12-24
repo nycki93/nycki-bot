@@ -10,7 +10,7 @@ const CHANNEL = '#nycki';
 const NICK = 'nycki-bot';
 const PREFIX = 'nb ';
 
-export class AppIrc implements Mod {
+export class Irc implements Mod {
     bot: Bot;
     client: Client;
     constructor(bot: Bot) {

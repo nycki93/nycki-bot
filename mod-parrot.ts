@@ -1,6 +1,6 @@
 import { Bot, Event, Mod } from './bot.ts';
 
-export class AppParrot implements Mod {
+export class Parrot implements Mod {
     bot: Bot;
     constructor(bot: Bot) {
         this.bot = bot;

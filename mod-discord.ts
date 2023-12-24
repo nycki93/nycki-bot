@@ -25,7 +25,7 @@ function readWriteConfig(path = 'config.json') {
     return config;
 }
 
-export class AppDiscord implements Mod {
+export class Discord implements Mod {
     bot: Bot;
     config: Config;
     client: Client;

@@ -2,7 +2,7 @@ import { TextLineStream } from "std/streams/text_line_stream.ts";
 
 import { Bot, Event, Mod } from "./bot.ts";
 
-export class AppConsole implements Mod {
+export class Console implements Mod {
     bot: Bot;
     user: string;
 

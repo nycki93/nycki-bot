@@ -1,19 +1,19 @@
-import { AppCommands } from "./app-commands.ts";
-import { AppConsole } from "./app-console.ts";
-import { AppDiscord } from "./app-discord.ts";
-import { AppIrc } from "./app-irc.ts";
-import { AppParrot } from "./app-parrot.ts";
-import { AppTictactoe } from "./app-tictactoe.ts";
+import { Commands } from "./mod-commands.ts";
+import { Console } from "./mod-console.ts";
+import { Discord } from "./mod-discord.ts";
+import { Irc } from "./mod-irc.ts";
+import { Parrot } from "./mod-parrot.ts";
+import { Tictactoe } from "./mod-tictactoe.ts";
 import { Bot } from './bot.ts';
 
 if (import.meta.main) {
     const bot = new Bot(
-        AppConsole, 
-        AppDiscord,
-        AppIrc, 
-        AppCommands,
-        AppTictactoe,
-        AppParrot, 
+        Console, 
+        Discord,
+        Irc, 
+        Commands,
+        Tictactoe,
+        Parrot, 
     );
     bot.start();
 }

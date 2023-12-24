@@ -1,6 +1,6 @@
 import { Bot, Event, Mod } from './bot.ts';
 
-export class AppCommands implements Mod {
+export class Commands implements Mod {
     bot: Bot;
     constructor(bot: Bot) { this.bot = bot }
 

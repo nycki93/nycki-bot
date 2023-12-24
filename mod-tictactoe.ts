@@ -1,6 +1,6 @@
 import { Bot, Event, EventMessage, Mod } from './bot.ts'
 
-export class AppTictactoe implements Mod {
+export class Tictactoe implements Mod {
     bot: Bot;
     player_x?: string;
     player_o?: string;
