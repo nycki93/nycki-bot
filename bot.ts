@@ -39,7 +39,7 @@ export class Bot {
             const e = await this.shift();
             for (const p of this.plugins) {
                 const used = await p.handle(e);
-                if (used) continue;
+                if (used) break;
             }
         }
     }

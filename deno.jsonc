@@ -6,6 +6,6 @@
   },
   "tasks": {
     "dev": "deno run --watch main.ts",
-    "console": "deno run main-console.ts"
+    "start": "deno run main.ts"
   }
 }

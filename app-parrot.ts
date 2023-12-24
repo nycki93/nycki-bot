@@ -9,12 +9,8 @@ export class AppParrot implements Plugin {
     start() {}
 
     handle(e: Event) {
-        if (e.type === 'message') {
-            this.bot.push({
-                type: 'write',
-                text: `Squawk! ${e.text}!`,
-            });
-        }
-        return false;
+        if (e.type !== 'message') return false;
+        this.bot.write(`Squawk! ${e.text}!`)
+        return true;
     }
 }
