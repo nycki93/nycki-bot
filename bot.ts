@@ -24,20 +24,17 @@ export class Bot {
     plugins: Plugin[];
     events: Event[];
     resolveNextEvent?: (event: Event) => void;
-    constructor(...plugins: PluginConstructor[]) {
+    constructor(...pluginConstructors: PluginConstructor[]) {
         this.events = [];
         this.plugins = [];
-        for (const P of plugins) {
+        for (const P of pluginConstructors) {
             const p = new P(this);
             this.plugins.push(p);
         }
     }
 
     async start() {
-        for (const p of this.plugins) {
-            console.log('loading plugin');
-            await p.start();
-        }
+        await Promise.all(this.plugins.map(p => p.start()));
         while (true) {
             const e = await this.shift();
             for (const p of this.plugins) {
