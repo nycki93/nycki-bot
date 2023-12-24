@@ -1,5 +1,6 @@
 {
   "imports": {
+    "discord": "npm:discord.js@14.13.0",
     "irc/": "https://deno.land/x/irc@v0.12.5/",
     "std/": "https://deno.land/std@0.210.0/"
   },

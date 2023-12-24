@@ -12,7 +12,7 @@ export type EventWrite = {
 export type Event = EventMessage | EventWrite;
 
 export interface Plugin {
-    handle: (event: Event) => boolean,
+    handle: (event: Event) => boolean | Promise<boolean>,
     start: () => void | Promise<void>,
 }
 
@@ -38,7 +38,7 @@ export class Bot {
         while (true) {
             const e = await this.shift();
             for (const p of this.plugins) {
-                const used = p.handle(e);
+                const used = await p.handle(e);
                 if (used) continue;
             }
         }
