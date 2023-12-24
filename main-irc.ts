@@ -57,7 +57,7 @@ class IrcBot implements Bot {
                 text: command,
             };
             for (const p of this.plugins) {
-                const t = p.send(e);
+                const t = p.handle(e);
                 if (t) break;
             }
         });

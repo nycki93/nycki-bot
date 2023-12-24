@@ -10,5 +10,5 @@ export interface Bot {
 }
 
 export interface Plugin {
-    send: (event: Event) => boolean,
+    handle: (event: Event) => boolean,
 }

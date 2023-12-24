@@ -11,7 +11,7 @@ export class TictactoeGame implements Plugin {
         this.bot = bot;
     }
 
-    send(e: Event) {
+    handle(e: Event) {
         if (e.type !== 'message') return false;
         const args = e.text.trim().split(/\s+/);
         if (args[0] === 'join') return this.join(e, args);

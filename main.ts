@@ -7,7 +7,7 @@ export class Commands implements Plugin {
         this.bot = bot;
     }
 
-    send(e: Event) {
+    handle(e: Event) {
         if (e.type !== 'message') return false;
         const text = e.text.trim();
         if (text === 'ping') {
@@ -62,7 +62,7 @@ class TestBot implements Bot {
                 text: text,
             }
             for (const p of this.plugins) {
-                const t = p.send(e);
+                const t = p.handle(e);
                 if (t) break;
             }
         }
