@@ -1,5 +1,6 @@
 {
   "imports": {
+    "std/": "https://deno.land/std@0.210.0/",
     "irc": "https://deno.land/x/irc@v0.12.5/mod.ts"
   },
   "tasks": {
