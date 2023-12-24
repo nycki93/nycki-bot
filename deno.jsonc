@@ -1,10 +1,10 @@
 {
   "imports": {
-    "std/": "https://deno.land/std@0.210.0/",
-    "irc": "https://deno.land/x/irc@v0.12.5/mod.ts"
+    "irc": "https://deno.land/x/irc@v0.12.5/mod.ts",
+    "std/": "https://deno.land/std@0.210.0/"
   },
   "tasks": {
     "dev": "deno run --watch main.ts",
-    "console": "deno run console.ts"
+    "console": "deno run main-console.ts"
   }
 }

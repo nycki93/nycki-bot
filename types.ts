@@ -1,14 +1,25 @@
-export type Event = {
+export type EventMessage = {
     type: 'message',
     user: string,
-    text: string
+    text: string,
 }
 
+export type EventWrite = {
+    type: 'write',
+    text: string,
+}
+
+export type Event = EventMessage | EventWrite;
+
 export interface Bot {
-    write: (text: string) => void,
-    quit: () => void,
+    push: (event: Event) => void,
 }
 
 export interface Plugin {
-    handle: (event: Event) => boolean,
+    handle: (event: Event) => void,
+    start: () => void,
+}
+
+export interface PluginConstructor {
+    new (bot: Bot): Plugin,
 }

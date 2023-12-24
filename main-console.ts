@@ -1,51 +1,108 @@
-import { TextLineStream } from 'std/streams/text_line_stream.ts';
+import { stdin, stdout } from 'node:process';
+import * as readline from 'node:readline';
 
-import { Bot, Event, Plugin } from './types.ts';
+import { Bot, Event, Plugin, PluginConstructor } from './types.ts';
 
 class TestBot implements Bot {
     plugins: Plugin[];
-    constructor() {
+    events: Event[];
+    resolveNextEvent?: (event: Event) => void;
+    constructor(...plugins: PluginConstructor[]) {
+        this.events = [];
         this.plugins = [];
-        this.plugins.push(new ConsoleClient(this));
+        for (const P of plugins) {
+            const p = new P(this);
+            this.plugins.push(p);
+        }
     }
 
-    write(text: string) {
-        console.log(`<bot> ${text}`);
+    async start() {
+        for (const p of this.plugins) {
+            p.start();
+        }
+        while (true) {
+            const e = await this.shift();
+            for (const p of this.plugins) {
+                p.handle(e);
+            }
+        }
+    }
+    
+    push(event: Event) {
+        if (this.resolveNextEvent) {
+            this.resolveNextEvent(event);
+            this.resolveNextEvent = undefined;
+        } else {
+            this.events.push(event);
+        }
     }
 
-    quit() {
-        return false;
+    shift() {
+        if (this.events.length) {
+            return Promise.resolve(this.events.shift() as Event);
+        } else {
+            return new Promise<Event>(r => this.resolveNextEvent = r);
+        }
+    }
+}
+
+class Parrot implements Plugin {
+    bot: Bot;
+
+    constructor(bot: Bot) {
+        this.bot = bot;
+    }
+
+    start() {}
+
+    handle(e: Event) {
+        if (e.type === 'message') {
+            this.bot.push({
+                type: 'write',
+                text: `Squawk! ${e.text}!`,
+            });
+        }
     }
 }
 
 export class ConsoleClient implements Plugin {
-    bot: Bot
+    bot: Bot;
+    rl: readline.Interface;
 
     constructor(bot: Bot) {
         this.bot = bot;
-        this.listen();
+        this.rl = readline.createInterface({
+            input: stdin,
+            output: stdout,
+        });
     }
 
-    async listen() {
-        const lines = (Deno.stdin.readable
-            .pipeThrough(new TextDecoderStream())
-            .pipeThrough(new TextLineStream())
-        );
-        for await (const line of lines) {
-            console.log(`<console> ${line}`);
+    start() {
+        this.rl.on('line', (line) => {
+            this.bot.push({
+                type: 'message',
+                user: 'console',
+                text: line,
+            });
+        })
+    }
+
+    handle(e: Event) {
+        if (e.type === 'message') {
+            console.log(`<${e.user}> ${e.text}`);
+        } else if (e.type === 'write') {
+            console.log(`<bot> ${e.text}`);
         }
-    }
-
-    handle(_e: Event) {
-        return false;
     }
 }
 
 if (import.meta.main) {
-    new TestBot();
+    const bot = new TestBot(ConsoleClient, Parrot);
+    bot.start();
+
     let n = 0;
     while (true) {
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 10_000));
         console.log(`tick ${n}`);
         n += 1;
     }
