@@ -1,4 +1,4 @@
-import { Bot, Event, Plugin } from "./types.ts";
+import { Bot, Event, EventMessage, Plugin } from './bot.ts'
 
 export class TictactoeGame implements Plugin {
     bot: Bot;
@@ -11,15 +11,17 @@ export class TictactoeGame implements Plugin {
         this.bot = bot;
     }
 
+    start() {}
+
     handle(e: Event) {
-        if (e.type !== 'message') return false;
+        if (e.type !== 'message') return;
         const args = e.text.trim().split(/\s+/);
         if (args[0] === 'join') return this.join(e, args);
         if (args[0] === 'play') return this.play(e, args);
         return false;
     }
 
-    join(e: Event, args: string[]) {
+    join(e: EventMessage, args: string[]) {
         if (this.player_x && this.player_o) {
             this.bot.write('cannot join now, game in progress.');
             return true;
@@ -54,7 +56,7 @@ export class TictactoeGame implements Plugin {
         return true;
     }
 
-    play(e: Event, args: string[]) {
+    play(e: EventMessage, args: string[]) {
         if (this.done) {
             this.bot.write('the game has ended.');
             return true;
