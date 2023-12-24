@@ -12,8 +12,8 @@ export type EventWrite = {
 export type Event = EventMessage | EventWrite;
 
 export interface Plugin {
-    handle: (event: Event) => void,
-    start: () => void,
+    handle: (event: Event) => boolean,
+    start: () => void | Promise<void>,
 }
 
 export interface PluginConstructor {
@@ -35,12 +35,14 @@ export class Bot {
 
     async start() {
         for (const p of this.plugins) {
-            p.start();
+            console.log('loading plugin');
+            await p.start();
         }
         while (true) {
             const e = await this.shift();
             for (const p of this.plugins) {
-                p.handle(e);
+                const used = p.handle(e);
+                if (used) continue;
             }
         }
     }

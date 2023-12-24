@@ -1,6 +1,6 @@
 import { Bot, Event, EventMessage, Plugin } from './bot.ts'
 
-export class TictactoeGame implements Plugin {
+export class AppTictactoe implements Plugin {
     bot: Bot;
     player_x?: string;
     player_o?: string;
@@ -14,7 +14,7 @@ export class TictactoeGame implements Plugin {
     start() {}
 
     handle(e: Event) {
-        if (e.type !== 'message') return;
+        if (e.type !== 'message') return false;
         const args = e.text.trim().split(/\s+/);
         if (args[0] === 'join') return this.join(e, args);
         if (args[0] === 'play') return this.play(e, args);
