@@ -1,7 +1,7 @@
 import { Client } from 'irc/mod.ts';
 import { PrivmsgEvent } from "irc/plugins/privmsg.ts";
 
-import { Bot, Event, Plugin } from './bot.ts';
+import { Bot, Event, Mod } from './bot.ts';
 
 const SERVER = 'irc.esper.net';
 const PORT = 6697;
@@ -10,7 +10,7 @@ const CHANNEL = '#nycki';
 const NICK = 'nycki-bot';
 const PREFIX = 'nb ';
 
-export class AppIrc implements Plugin {
+export class AppIrc implements Mod {
     bot: Bot;
     client: Client;
     constructor(bot: Bot) {

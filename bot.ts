@@ -11,34 +11,34 @@ export type EventWrite = {
 
 export type Event = EventMessage | EventWrite;
 
-export interface Plugin {
+export interface Mod {
     handle: (event: Event) => boolean | Promise<boolean>,
     start: () => void | Promise<void>,
 }
 
-export interface PluginConstructor {
-    new (bot: Bot): Plugin,
+export interface ModConstructor {
+    new (bot: Bot): Mod,
 }
 
 export class Bot {
-    plugins: Plugin[];
+    mods: Mod[];
     events: Event[];
     resolveNextEvent?: (event: Event) => void;
-    constructor(...pluginConstructors: PluginConstructor[]) {
+    constructor(...modConstructors: ModConstructor[]) {
         this.events = [];
-        this.plugins = [];
-        for (const P of pluginConstructors) {
-            const p = new P(this);
-            this.plugins.push(p);
+        this.mods = [];
+        for (const Mod of modConstructors) {
+            const mod = new Mod(this);
+            this.mods.push(mod);
         }
     }
 
     async start() {
-        await Promise.all(this.plugins.map(p => p.start()));
+        await Promise.all(this.mods.map(a => a.start()));
         while (true) {
-            const e = await this.shift();
-            for (const p of this.plugins) {
-                const used = await p.handle(e);
+            const event = await this.shift();
+            for (const mod of this.mods) {
+                const used = await mod.handle(event);
                 if (used) break;
             }
         }

@@ -1,6 +1,6 @@
-import { Bot, Event, Plugin } from './bot.ts';
+import { Bot, Event, Mod } from './bot.ts';
 
-export class AppParrot implements Plugin {
+export class AppParrot implements Mod {
     bot: Bot;
     constructor(bot: Bot) {
         this.bot = bot;

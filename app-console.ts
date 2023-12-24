@@ -1,8 +1,8 @@
 import { TextLineStream } from "std/streams/text_line_stream.ts";
 
-import { Bot, Event, Plugin } from "./bot.ts";
+import { Bot, Event, Mod } from "./bot.ts";
 
-export class AppConsole implements Plugin {
+export class AppConsole implements Mod {
     bot: Bot;
     user: string;
 

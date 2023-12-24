@@ -1,5 +1,5 @@
 import { Client, Events, GatewayIntentBits, TextChannel, userMention } from 'discord'
-import { Bot, Event, Plugin } from "./bot.ts";
+import { Bot, Event, Mod } from "./bot.ts";
 
 type Config = {
     prefix: string,
@@ -25,7 +25,7 @@ function readWriteConfig(path = 'config.json') {
     return config;
 }
 
-export class AppDiscord implements Plugin {
+export class AppDiscord implements Mod {
     bot: Bot;
     config: Config;
     client: Client;

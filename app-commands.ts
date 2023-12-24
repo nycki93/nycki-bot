@@ -1,6 +1,6 @@
-import { Bot, Event, Plugin } from './bot.ts';
+import { Bot, Event, Mod } from './bot.ts';
 
-export class AppCommands implements Plugin {
+export class AppCommands implements Mod {
     bot: Bot;
     constructor(bot: Bot) { this.bot = bot }
 
