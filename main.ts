@@ -9,11 +9,11 @@ import { Bot } from './bot.ts';
 if (import.meta.main) {
     const bot = new Bot(
         Console, 
-        Discord,
-        Irc, 
+        // Discord,
+        // Irc, 
         Commands,
         Tictactoe,
-        Parrot, 
+        // Parrot, 
     );
     bot.start();
 }
