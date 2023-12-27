@@ -48,7 +48,7 @@ async function main() {
             break;
         } else if (32 <= c && c <= 126) {
             // printable char
-            line += String.fromCharCode(c);
+            line += String.fromCodePoint(c);
         } else if (c === 10 || c === 13) {
             // newline
             writer.write(encoder.encode(`\r\n`));
